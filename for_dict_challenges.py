@@ -4,7 +4,7 @@
 # Вася: 1
 # Маша: 2
 # Петя: 2
-
+print('Задание 1')
 students = [
     {'first_name': 'Вася'},
     {'first_name': 'Петя'},
@@ -12,9 +12,15 @@ students = [
     {'first_name': 'Маша'},
     {'first_name': 'Петя'},
 ]
-# ???
+names = {}
+for line in students:
+    names[line['first_name']] = names.setdefault(line['first_name'], 0) + 1
 
+for name, count in names.items():
+    print(f"{name}: {count}")
+print()
 
+print('Задание 2')
 # Задание 2
 # Дан список учеников, нужно вывести самое часто повторящееся имя
 # Пример вывода:
@@ -26,9 +32,17 @@ students = [
     {'first_name': 'Маша'},
     {'first_name': 'Оля'},
 ]
-# ???
+names = {}
+for line in students:
+    names[line['first_name']] = names.setdefault(line['first_name'], 0) + 1
+max_value, target_name = 0 , ''
+for name, value in names.items():
+    if value > max_value:
+        max_value, target_name = value, name
+print(f"Самое частое имя среди учеников: {target_name}")
+print()
 
-
+print('Задание 3')
 # Задание 3
 # Есть список учеников в нескольких классах, нужно вывести самое частое имя в каждом классе.
 # Пример вывода:
@@ -51,13 +65,23 @@ school_students = [
         {'first_name': 'Саша'},
     ],
 ]
-# ???
+names = {}
+for clas in school_students:
+    for line in clas:
+        names[line['first_name']] = names.setdefault(line['first_name'], 0) + 1
+    max_value, target_name = 0 , ''
+    for name, value in names.items():
+        if value > max_value:
+            max_value, target_name = value, name
+    print(f"Самое частое имя среди учеников: {target_name}")
+    names.clear()
+print()
 
-
+print('Задание 4')
 # Задание 4
 # Для каждого класса нужно вывести количество девочек и мальчиков в нём.
 # Пример вывода:
-# Класс 2a: девочки 2, мальчики 0 
+# Класс 2a: девочки 2, мальчики 0
 # Класс 2б: девочки 0, мальчики 2
 
 school = [
@@ -72,9 +96,16 @@ is_male = {
     'Миша': True,
     'Даша': False,
 }
-# ???
 
+for clas in school:
+    sex = {False: 0, True: 0}
+    for student in clas['students']:
+       sex[is_male[student['first_name']]] = sex.setdefault(is_male[student['first_name']], 0) + 1
+    print(f"{clas['class']}: девочки {sex[False]}, мальчики {sex[True]}")
+    sex.clear()
+print()
 
+print('Задание 5')
 # Задание 5
 # По информации о учениках разных классов нужно найти класс, в котором больше всего девочек и больше всего мальчиков
 # Пример вывода:
@@ -91,5 +122,16 @@ is_male = {
     'Олег': True,
     'Миша': True,
 }
-# ???
-
+gerl_max, gerl_class = 0, ''
+boy_max, boy_class = 0, ''
+for clas in school:
+    sex = {False: 0, True: 0}
+    for student in clas['students']:
+       sex[is_male[student['first_name']]] = sex.setdefault(is_male[student['first_name']], 0) + 1
+    if sex[False] > gerl_max:
+        gerl_max, gerl_class = sex[False], clas['class']
+    if sex[True] > boy_max:
+        boy_max, boy_class = sex[True], clas['class']
+    sex.clear()
+print(f"Больше всего мальчиков в классе {boy_class}")
+print(f"Больше всего девочек в классе {gerl_class}")
