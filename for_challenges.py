@@ -29,9 +29,19 @@ is_male = {
     'Вася': True,
     'Маша': False,
 }
-names = ['Оля', 'Петя', 'Вася', 'Маша']
-for name in names:
+# names = ['Оля', 'Петя', 'Вася', 'Маша', 'Алевтина', 'Георгий']
+# for name in names:
+#     is_male.setdefault(name, 'нет данных')
+#     if is_male[name] == 'нет данных':
+#         print(f'{name}: нет данных')
+#     else:
+#         print(f'{name}:', 'Мужской' if is_male.get(name, False) else 'Женский')
+
+
+for name in is_male.keys():
     print(f'{name}:', 'Мужской' if is_male[name] else 'Женский')
+
+
 print()
 
 print('Задание 4')

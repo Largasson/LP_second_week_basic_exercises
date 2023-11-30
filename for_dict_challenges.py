@@ -1,3 +1,13 @@
+from collections import defaultdict
+
+
+def count_max(d):
+    return (max(d.items(), key=lambda item: item[1]))[0]
+
+def def_value():
+    return 0
+
+
 # Задание 1
 # Дан список учеников, нужно посчитать количество повторений каждого имени ученика
 # Пример вывода:
@@ -12,17 +22,16 @@ students = [
     {'first_name': 'Маша'},
     {'first_name': 'Петя'},
 ]
-names = {}
+names = defaultdict(int)
 for line in students:
-    names[line['first_name']] = names.setdefault(line['first_name'], 0) + 1
-
+    names[line['first_name']] += 1
 for name, count in names.items():
     print(f"{name}: {count}")
 print()
 
 print('Задание 2')
 # Задание 2
-# Дан список учеников, нужно вывести самое часто повторящееся имя
+# Дан список учеников, нужно вывести самое часто повторяющееся имя
 # Пример вывода:
 # Самое частое имя среди учеников: Маша
 students = [
@@ -32,14 +41,11 @@ students = [
     {'first_name': 'Маша'},
     {'first_name': 'Оля'},
 ]
-names = {}
+names = defaultdict(int)
+
 for line in students:
-    names[line['first_name']] = names.setdefault(line['first_name'], 0) + 1
-max_value, target_name = 0 , ''
-for name, value in names.items():
-    if value > max_value:
-        max_value, target_name = value, name
-print(f"Самое частое имя среди учеников: {target_name}")
+    names[line['first_name']] += 1
+print(f"Самое частое имя среди учеников: {count_max(names)}")
 print()
 
 print('Задание 3')
@@ -58,22 +64,18 @@ school_students = [
         {'first_name': 'Маша'},
         {'first_name': 'Маша'},
         {'first_name': 'Оля'},
-    ],[  # это – третий класс
+    ], [  # это – третий класс
         {'first_name': 'Женя'},
         {'first_name': 'Петя'},
         {'first_name': 'Женя'},
         {'first_name': 'Саша'},
     ],
 ]
-names = {}
+names = defaultdict(int)
 for clas in school_students:
     for line in clas:
-        names[line['first_name']] = names.setdefault(line['first_name'], 0) + 1
-    max_value, target_name = 0 , ''
-    for name, value in names.items():
-        if value > max_value:
-            max_value, target_name = value, name
-    print(f"Самое частое имя среди учеников: {target_name}")
+        names[line['first_name']] += 1
+    print(f"Самое частое имя среди учеников: {count_max(names)}")
     names.clear()
 print()
 
@@ -97,12 +99,15 @@ is_male = {
     'Даша': False,
 }
 
-for clas in school:
-    sex = {False: 0, True: 0}
-    for student in clas['students']:
-       sex[is_male[student['first_name']]] = sex.setdefault(is_male[student['first_name']], 0) + 1
-    print(f"{clas['class']}: девочки {sex[False]}, мальчики {sex[True]}")
-    sex.clear()
+is_male_2 = {name: 'boy' if sex else 'girl' for name, sex in is_male.items()}
+
+for school_class in school:
+    count_students = defaultdict(def_value)
+    for student in school_class['students']:
+        sex_key = is_male_2[student['first_name']]
+        count_students[sex_key] += 1
+    print(f"{school_class['class']}: девочки {count_students['girl']}, мальчики {count_students['boy']}")
+    count_students.clear()
 print()
 
 print('Задание 5')
@@ -122,16 +127,20 @@ is_male = {
     'Олег': True,
     'Миша': True,
 }
-gerl_max, gerl_class = 0, ''
+# Накопление информации идет не так как в предыдущих примерах.
+# Функцию применить наверное можно, но мне кажется, что код еще больше увеличится.
+is_male_2 = {name: 'boy' if sex else 'girl' for name, sex in is_male.items()}
+girl_max, girl_class = 0, ''
 boy_max, boy_class = 0, ''
 for clas in school:
-    sex = {False: 0, True: 0}
+    count_students = defaultdict(def_value)
     for student in clas['students']:
-       sex[is_male[student['first_name']]] = sex.setdefault(is_male[student['first_name']], 0) + 1
-    if sex[False] > gerl_max:
-        gerl_max, gerl_class = sex[False], clas['class']
-    if sex[True] > boy_max:
-        boy_max, boy_class = sex[True], clas['class']
-    sex.clear()
+        sex_key = is_male_2[student['first_name']]
+        count_students[sex_key] += 1
+    if count_students['girl'] > girl_max:
+        girl_max, girl_class = count_students[False], clas['class']
+    if count_students['boy'] > boy_max:
+        boy_max, boy_class = count_students['boy'], clas['class']
+    count_students.clear()
 print(f"Больше всего мальчиков в классе {boy_class}")
-print(f"Больше всего девочек в классе {gerl_class}")
+print(f"Больше всего девочек в классе {girl_class}")
