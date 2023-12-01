@@ -119,6 +119,7 @@ print('Задание 5')
 school = [
     {'class': '2a', 'students': [{'first_name': 'Маша'}, {'first_name': 'Оля'}]},
     {'class': '3c', 'students': [{'first_name': 'Олег'}, {'first_name': 'Миша'}]},
+    {'class': '4c', 'students': [{'first_name': 'Олег'}, {'first_name': 'Миша'}]}
 ]
 is_male = {
     'Маша': False,
