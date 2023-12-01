@@ -76,7 +76,7 @@ for clas in school_students:
     for line in clas:
         names[line['first_name']] += 1
     print(f"Самое частое имя среди учеников: {count_max(names)}")
-    names.clear()
+    names = defaultdict(int)
 print()
 
 print('Задание 4')
@@ -102,12 +102,11 @@ is_male = {
 is_male_2 = {name: 'boy' if sex else 'girl' for name, sex in is_male.items()}
 
 for school_class in school:
-    count_students = defaultdict(def_value)
+    count_students = defaultdict(int)
     for student in school_class['students']:
         sex_key = is_male_2[student['first_name']]
         count_students[sex_key] += 1
     print(f"{school_class['class']}: девочки {count_students['girl']}, мальчики {count_students['boy']}")
-    count_students.clear()
 print()
 
 print('Задание 5')
@@ -138,7 +137,7 @@ for clas in school:
         sex_key = is_male_2[student['first_name']]
         count_students[sex_key] += 1
     if count_students['girl'] > girl_max:
-        girl_max, girl_class = count_students[False], clas['class']
+        girl_max, girl_class = count_students['girl'], clas['class']
     if count_students['boy'] > boy_max:
         boy_max, boy_class = count_students['boy'], clas['class']
     count_students.clear()
