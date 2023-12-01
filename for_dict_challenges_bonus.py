@@ -82,25 +82,31 @@ def search_most_user_id(lst: list):
 
 def search_most_reply_user_id(lst: list):
     """ 2. Вывести айди пользователя, на сообщения которого больше всего отвечали. """
-    my_dict = defaultdict(int)
-    lst_reply_for = {line['reply_for'] for line in lst}
-    for r_id in lst_reply_for:
-        for line in lst:
-            if line['id'] == r_id:
-                my_dict[line['sent_by']] += 1
+    #my_dict = defaultdict(int)
+    new_dict = {line['id']: line for line in lst}
+    popular_autor_dict = defaultdict(int)
+    for line in new_dict.values():
+        if line['reply_for']:
+            popular_autor = new_dict[line['reply_for']]['sent_by']
+            popular_autor_dict[popular_autor] += 1
     return (f'ID пользователя, на сообщения которого больше всего отвечали: '
-            f'{(max(my_dict.items(), key=lambda item: item[1]))[0]}')
-
+            f'{max(popular_autor_dict.items(), key=lambda item: item[1])[0]}')
 
 def search_user_id_unic(lst: list):
     """ 3. Вывести айди пользователей, сообщения которых видело больше всего уникальных пользователей."""
-    my_dict = {}
-    for line in lst:
-        key = line['sent_by']
-        adding = line['seen_by']
-        my_dict[key] = my_dict.get(key, []) + adding
-    # for k, v in my_dict.items():     чтобы подключить и посмотреть словарь где ключи - айди отправителей,                      !!!!!!!!!!!!!!!!!
-    #     print(f'{k}: {set(v)}')           а значения уникальные айди прочитавших пользователей                                !!!!!!!!!!!!!!
+    autor_message_dict = {}
+    for line in lst:  # проходимся по словарям
+        # берем автора и делаем его ключом в новом словаре
+        autor_message = line['sent_by']
+        # берем всех пользователей, что видели это сообщение.
+        # делаем на них set() -  удаляя повторы
+        unic_users = set(line['seen_by'])
+        # добавляем в новый словарь по автору уникальных пользователей
+        autor_message_dict[autor_message] = autor_message_dict.setdefault(autor_message, set()).union(unic_users)
+    # выводим
+    for autor_message, unic_users in autor_message_dict.items():
+        print(f'{autor_message}: {unic_users}')
+
     return (f'Получается, что все пользователи видели сообщения друг друга, или я неправильно понял задачу. '
             f'Можно раскоментить словарь внутри функции и посмотреть значения')
 
@@ -147,8 +153,8 @@ def count_tred(lst: list):
 
 if __name__ == "__main__":
     lst = generate_chat_history()
-    print(search_most_user_id(lst))
+    # print(search_most_user_id(lst))
     print(search_most_reply_user_id(lst))
-    print(search_user_id_unic(lst))
-    print(time_research(lst))
-    print(*count_tred(lst), sep='\n')
+    # print(search_user_id_unic(lst))
+    # print(time_research(lst))
+    # print(*count_tred(lst), sep='\n')
