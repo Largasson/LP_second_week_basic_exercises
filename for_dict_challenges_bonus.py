@@ -82,7 +82,7 @@ def search_most_user_id(lst: list):
 
 def search_most_reply_user_id(lst: list):
     """ 2. Вывести айди пользователя, на сообщения которого больше всего отвечали. """
-    #my_dict = defaultdict(int)
+    # my_dict = defaultdict(int)
     new_dict = {line['id']: line for line in lst}
     popular_autor_dict = defaultdict(int)
     for line in new_dict.values():
@@ -91,6 +91,7 @@ def search_most_reply_user_id(lst: list):
             popular_autor_dict[popular_autor] += 1
     return (f'ID пользователя, на сообщения которого больше всего отвечали: '
             f'{max(popular_autor_dict.items(), key=lambda item: item[1])[0]}')
+
 
 def search_user_id_unic(lst: list):
     """ 3. Вывести айди пользователей, сообщения которых видело больше всего уникальных пользователей."""
@@ -104,8 +105,8 @@ def search_user_id_unic(lst: list):
         # добавляем в новый словарь по автору уникальных пользователей
         autor_message_dict[autor_message] = autor_message_dict.setdefault(autor_message, set()).union(unic_users)
     # выводим
-    for autor_message, unic_users in autor_message_dict.items():
-        print(f'{autor_message}: {unic_users}')
+    # for autor_message, unic_users in autor_message_dict.items():
+    #     print(f'{autor_message}: {unic_users}')
 
     return (f'Получается, что все пользователи видели сообщения друг друга, или я неправильно понял задачу. '
             f'Можно раскоментить словарь внутри функции и посмотреть значения')
@@ -117,7 +118,7 @@ def time_research(lst: list):
     for line in lst:
         if line['sent_at'].hour < 12:
             my_dict['утром'] += 1
-        elif 12 <= line['sent_at'].hour <= 18:
+        elif 12 <= line['sent_at'].hour < 18:
             my_dict['днем'] += 1
         else:
             my_dict['вечером'] += 1
@@ -127,22 +128,18 @@ def time_research(lst: list):
 
 def count_tred(lst: list):
     """ 5. Вывести идентификаторы сообщений, который стали началом для самых длинных тредов (цепочек ответов). """
-    tred_dict = {line['id']: line['reply_for'] for line in lst}
-    lst_message = list(tred_dict.keys())
-    message = lst_message.pop()
-    count = 0
-    search_id = copy(message)
-    res = {}
-    while message and len(lst_message) > 0:
-        if tred_dict[message]:
-            count += 1
-            message = tred_dict[message]
-        else:
-            res[search_id] = count
-            count = 0
-            message = lst_message.pop()
-            search_id = copy(message)
-    res = dict(sorted(res.items(), key=lambda item: item[1], reverse=True))
+    parents_count = {message['id']: 0 for message in lst if message['reply_for'] is None}
+    id_to_message_inf = {message['id']: message for message in lst}
+    for parent_id in parents_count:
+        count = 0
+        parent_id_backup = parent_id
+        for message_inf in id_to_message_inf.values():
+            if parent_id == message_inf['reply_for']:
+                count += 1
+                parent_id = message_inf['id']
+        parents_count[parent_id_backup] = count
+
+    res = dict(sorted(parents_count.items(), key=lambda item: item[1]))
     max_count = max(res.items(), key=lambda item: item[1])[1]
     res = dict(filter(lambda item: item[1] == max_count, res.items()))
     answer = []
@@ -153,8 +150,8 @@ def count_tred(lst: list):
 
 if __name__ == "__main__":
     lst = generate_chat_history()
-    # print(search_most_user_id(lst))
+    print(search_most_user_id(lst))
     print(search_most_reply_user_id(lst))
-    # print(search_user_id_unic(lst))
-    # print(time_research(lst))
-    # print(*count_tred(lst), sep='\n')
+    print(search_user_id_unic(lst))
+    print(time_research(lst))
+    print(*count_tred(lst), sep='\n')
