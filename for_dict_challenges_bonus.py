@@ -117,7 +117,7 @@ def time_research(lst: list):
     for line in lst:
         if line['sent_at'].hour < 12:
             my_dict['утром'] += 1
-        elif 12 <= line['sent_at'].hour <= 18:
+        elif 12 <= line['sent_at'].hour < 18:
             my_dict['днем'] += 1
         else:
             my_dict['вечером'] += 1
