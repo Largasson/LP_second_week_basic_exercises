@@ -33,8 +33,9 @@ messages = [
 import random
 import uuid
 import datetime
-
+from copy import copy
 import lorem
+from collections import defaultdict
 
 
 def generate_chat_history():
@@ -66,5 +67,91 @@ def generate_chat_history():
     return messages
 
 
+def def_value():
+    return 0
+
+
+def search_most_user_id(lst: list):
+    """ 1. Вывести айди пользователя, который написал больше всех сообщений. """
+    my_dict = defaultdict(int)
+    for line in lst:
+        my_dict[line['sent_by']] += 1
+    return (f'ID пользователя, который написал больше всех сообщений: '
+            f'{(max(my_dict.items(), key=lambda item: item[1]))[0]}')
+
+
+def search_most_reply_user_id(lst: list):
+    """ 2. Вывести айди пользователя, на сообщения которого больше всего отвечали. """
+    # my_dict = defaultdict(int)
+    new_dict = {line['id']: line for line in lst}
+    popular_autor_dict = defaultdict(int)
+    for line in new_dict.values():
+        if line['reply_for']:
+            popular_autor = new_dict[line['reply_for']]['sent_by']
+            popular_autor_dict[popular_autor] += 1
+    return (f'ID пользователя, на сообщения которого больше всего отвечали: '
+            f'{max(popular_autor_dict.items(), key=lambda item: item[1])[0]}')
+
+
+def search_user_id_unic(lst: list):
+    """ 3. Вывести айди пользователей, сообщения которых видело больше всего уникальных пользователей."""
+    autor_message_dict = {}
+    for line in lst:  # проходимся по словарям
+        # берем автора и делаем его ключом в новом словаре
+        autor_message = line['sent_by']
+        # берем всех пользователей, что видели это сообщение.
+        # делаем на них set() -  удаляя повторы
+        unic_users = set(line['seen_by'])
+        # добавляем в новый словарь по автору уникальных пользователей
+        autor_message_dict[autor_message] = autor_message_dict.setdefault(autor_message, set()).union(unic_users)
+    # выводим
+    # for autor_message, unic_users in autor_message_dict.items():
+    #     print(f'{autor_message}: {unic_users}')
+
+    return (f'Получается, что все пользователи видели сообщения друг друга, или я неправильно понял задачу. '
+            f'Можно раскоментить словарь внутри функции и посмотреть значения')
+
+
+def time_research(lst: list):
+    """ 4. Определить, когда в чате больше всего сообщений: утром (до 12 часов), днём (12-18 часов) или вечером (после 18 часов)."""
+    my_dict = defaultdict(int)
+    for line in lst:
+        if line['sent_at'].hour < 12:
+            my_dict['утром'] += 1
+        elif 12 <= line['sent_at'].hour < 18:
+            my_dict['днем'] += 1
+        else:
+            my_dict['вечером'] += 1
+    m = max(my_dict.items(), key=lambda item: item[1])[0]
+    return f'Больше всего сообщений в чате {m}'
+
+
+def count_tred(lst: list):
+    """ 5. Вывести идентификаторы сообщений, который стали началом для самых длинных тредов (цепочек ответов). """
+    parents_count = {message['id']: 0 for message in lst if message['reply_for'] is None}
+    id_to_message_inf = {message['id']: message for message in lst}
+    for parent_id in parents_count:
+        count = 0
+        parent_id_backup = parent_id
+        for message_inf in id_to_message_inf.values():
+            if parent_id == message_inf['reply_for']:
+                count += 1
+                parent_id = message_inf['id']
+        parents_count[parent_id_backup] = count
+
+    res = dict(sorted(parents_count.items(), key=lambda item: item[1]))
+    max_count = max(res.items(), key=lambda item: item[1])[1]
+    res = dict(filter(lambda item: item[1] == max_count, res.items()))
+    answer = []
+    for k, v in res.items():
+        answer.append(f'ID сообщения, которое является началом самых длинных тредов - {k}. Длина треда - {v}')
+    return answer
+
+
 if __name__ == "__main__":
-    print(generate_chat_history())
+    lst = generate_chat_history()
+    print(search_most_user_id(lst))
+    print(search_most_reply_user_id(lst))
+    print(search_user_id_unic(lst))
+    print(time_research(lst))
+    print(*count_tred(lst), sep='\n')
